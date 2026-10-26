@@ -16,6 +16,14 @@ const SETUP = join(PSTACK, "skills", "setup-pstack", "SKILL.md");
 // Commands that ship with Cursor or Claude Code, not in this repository. Nothing here can verify them, so add a name
 // only after a public Cursor or Claude Code doc shows it.
 const EXTERNAL = new Set(["add-plugin", "autopilot", "create-skill", "in-cloud", "loop", "plugin"]);
+// Skills from the cursor-team-kit plugin, which pstack calls but this repository no longer carries. Update the list
+// when cursor/plugins adds or renames one.
+const TEAM_KIT = new Set([
+  "check-compiler-errors", "control-cli", "control-ui", "deslop", "fix-ci", "fix-merge-conflicts", "get-pr-comments",
+  "loop-on-ci", "make-pr-easy-to-review", "new-branch-and-pr", "pr-review-canvas", "review-and-ship",
+  "run-smoke-tests", "thermo-nuclear-code-quality-review", "verify-this", "weekly-review", "what-did-i-get-done",
+  "workflow-from-chats",
+]);
 const RENAMED = new Map([["babysit", "autopilot"]]);
 
 const SMALL = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen".split(" ");
@@ -39,7 +47,6 @@ const principles = skills.filter((name) => name.startsWith("principle-"));
 const commands = skills.filter((name) => !name.startsWith("principle-"));
 const playbooks = names(join(PSTACK, "skills", "poteto-mode", "playbooks"), isMarkdown).map((name) => name.slice(0, -3));
 const agents = names(join(PSTACK, "agents"), isMarkdown).map((name) => name.slice(0, -3));
-const teamKit = names(join(ROOT, "cursor-team-kit", "skills"), isSkill);
 const docs = ["README.md", ...names(join(PSTACK, GUIDE), isMarkdown).map((name) => `${GUIDE}/${name}`)];
 const text = new Map(docs.map((doc) => [doc, readFileSync(join(PSTACK, doc), "utf8")]));
 const setup = readFileSync(SETUP, "utf8");
@@ -95,7 +102,7 @@ for (const [doc, body] of text) {
     slashes++;
     if (skills.includes(name)) named.get(doc).add(name);
     else if (RENAMED.has(name)) fail(doc, index, `names /${name}, which Cursor now ships as /${RENAMED.get(name)}`);
-    else if (!teamKit.includes(name) && !EXTERNAL.has(name)) {
+    else if (!TEAM_KIT.has(name) && !EXTERNAL.has(name)) {
       fail(doc, index, `names /${name}, which no pstack skill, cursor-team-kit skill, or listed built-in provides`);
     }
   }
